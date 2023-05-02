@@ -2,7 +2,9 @@ package com.educandoweb.projeto.spring.entites;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import com.educandoweb.projeto.spring.entites.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -14,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -37,6 +40,9 @@ public class Order implements Serializable {//pedido
 	@ManyToOne
 	@JoinColumn(name="client-id")//nome da chave estrangeira no BD
 	private User client;
+	
+	@OneToMany(mappedBy = "id.order")//no orderItem tem o id, por isso é chamado id.order
+	private Set<OrderItem> items = new HashSet<>();
 	
 	public Order() {
 	}
@@ -81,6 +87,10 @@ public class Order implements Serializable {//pedido
 	public void setOrderStatus(OrderStatus orderStatus) {
 		if(orderStatus != null)
 			this.orderStatus = orderStatus.getCode();//converte para OrderStatus
+	}
+	
+	public Set<OrderItem> getItems(){//pega os itens do pedido
+		return items;
 	}
 
 	@Override
