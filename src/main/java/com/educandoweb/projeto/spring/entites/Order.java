@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
+import com.educandoweb.projeto.spring.entites.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,6 +29,8 @@ public class Order implements Serializable {//pedido
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant moment;
 	
+	private Integer orderStatus;
+	
 	
 	//relacionamento de muitos pedidos para 1 cliente
 	
@@ -38,11 +41,12 @@ public class Order implements Serializable {//pedido
 	public Order() {
 	}
 
-	public Order(Long id, Instant moment, User client) {
+	public Order(Long id, Instant moment, OrderStatus orderStatus, User client) {
 		
 		this.id = id;
 		this.moment = moment;
 		this.client = client;
+		setOrderStatus(orderStatus);//no construtor o atributo é do tipo order status, mas na declarão é do tipo inteiro 
 	}
 
 	public Long getId() {
@@ -67,6 +71,16 @@ public class Order implements Serializable {//pedido
 
 	public void setClient(User client) {
 		this.client = client;
+	}
+	
+	
+	public OrderStatus getOrderStatus() {
+		return OrderStatus.valueOf(orderStatus);//converte para inteiro
+	}
+
+	public void setOrderStatus(OrderStatus orderStatus) {
+		if(orderStatus != null)
+			this.orderStatus = orderStatus.getCode();//converte para OrderStatus
 	}
 
 	@Override
