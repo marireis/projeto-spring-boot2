@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,8 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "tb_product")
@@ -37,6 +39,11 @@ public class Product implements Serializable{
 	inverseJoinColumns = @JoinColumn(name = "category_id"))//colocar a coluna inversa do relacionamento
 	private Set<Category> categories = new HashSet<>(); //Set - representa um conjunto, garante que o mesmo produto so tenha 1 categoria
 
+	//coleção de orderItem como feito na classe Order
+	@OneToMany(mappedBy = "id.product")//mapeado no BD - pega o id na classe OrderItem e o product pega na classe OrdemItemPK
+	private Set<OrderItem> items = new HashSet<>();//SET - informa ao JPA que não pode haver repetições do mesmo item
+	
+	
 	public Product() {
 	}
 
@@ -91,6 +98,14 @@ public class Product implements Serializable{
 
 	public Set<Category> getCategories() {
 		return categories;
+	}
+	@JsonIgnore //para evitar o loop
+	public Set<Order>getOrders(){//orders como no diagrama uml
+		Set<Order> set = new HashSet<>();
+		for(OrderItem x: items) {//percorre a coleção items(coleção do tipo order item associada ao produto), para cada elemento(x) adiciona ao conjunto x.getOrder(assim pega o objeto order associado ao OrderItem) 
+			set.add(x.getOrder());
+		}
+		return set;
 	}
 
 	@Override
