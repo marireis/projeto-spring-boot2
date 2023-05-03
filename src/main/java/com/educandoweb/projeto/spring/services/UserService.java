@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.educandoweb.projeto.spring.entites.User;
 import com.educandoweb.projeto.spring.repositores.UserRepository;
+import com.educandoweb.projeto.spring.resource.exceptions.DatabaseException;
 import com.educandoweb.projeto.spring.services.exceptions.ResourceNotFoundException;
 
 @Service
@@ -31,7 +33,13 @@ public class UserService {
 	}
 	
 	public void delete(Long id) {
-		repository.deleteById(id);
+		try {
+			repository.deleteById(id);			
+		} catch (EmptyResultDataAccessException e) {//não está retornando erro 404 no postman
+			throw new ResourceNotFoundException(id);
+		} catch (DataIntegrityViolationException e) {//quando quer deletar usuario relacionado com outras tabelas
+			throw new DatabaseException(e.getMessage());//lançando exceção da minha camada de serviço
+		}
 	}
 	
 	public User update(Long id, User obj) {
